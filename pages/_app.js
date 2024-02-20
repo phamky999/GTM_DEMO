@@ -21,8 +21,15 @@ import '@ionic/react/css/display.css';
 
 import '../styles/global.css';
 import '../styles/variables.css';
+import { useEffect } from 'react';
+import TagManager from 'react-gtm-module';
 
 function MyApp({ Component, pageProps }) {
+  useEffect(() => {
+    TagManager.initialize({
+      gtmId: 'GTM-P9WSGLCZ',
+    });
+  }, []);
   return (
     <>
       <Head>
