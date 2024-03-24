@@ -1,0 +1,95 @@
+<body>
+    <div class="users">Active: ... &nbsp&nbsp|&nbsp&nbsp Idle: ...</div>
+    <script type="module">
+      // Import Firebase modules:
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.6/firebase-app.js";
+      import {
+        getDatabase,
+        set,
+        get,
+        ref,
+        query,
+        onValue,
+        child,
+        push,
+        remove,
+        onDisconnect,
+      } from "https://www.gstatic.com/firebasejs/9.6.6/firebase-database.js";
+
+      // Firebase configuration:
+      const firebaseConfig = {
+        // apiKey: "AIzaSyDChSvCEHSlLxpl-oKr21_kjT3Z_1f-2Nw",
+        // authDomain: "realtime-editor-testing.firebaseapp.com",
+        // projectId: "realtime-editor-testing",
+        // storageBucket: "realtime-editor-testing.appspot.com",
+        // messagingSenderId: "905100052469",
+        // appId: "1:905100052469:web:cfaf1072946694eea342bc"
+        apiKey: "AIzaSyAendxmf96H421i2RpWwatLtgZVUSD-kYM",
+        authDomain: "clout-staing.firebaseapp.com",
+        databaseURL:
+          "https://clout-staing-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "clout-staing",
+        storageBucket: "clout-staing.appspot.com",
+        messagingSenderId: "396689766925",
+        appId: "1:396689766925:web:0a3577bbb85bdbb759b344",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
+      let pending = [];
+      let applied = [];
+      let uid =
+        "User" +
+        Date.now().toString() +
+        Math.floor(Math.random() * Math.pow(10, 5)).toString();
+      let lastKeyPress;
+      let lastChange;
+      let lastUpdated;
+      let prevContentUpdated = 0;
+      let contentCheck = 0;
+      let lastInputTimeStamp = 0;
+      let activeVertex = false;
+      let stack = {
+        undo: [],
+        redo: [],
+      };
+      let userCache = {};
+      let activeStyles = [];
+
+      let contentCheckDelay = 5;
+      let syncCount = 0;
+
+      window.addEventListener("load", async function () {
+        // If the client disconnects, clear their user data:
+        onDisconnect(ref(db, `users/${uid}`)).remove();
+
+        // Set the user data:
+        set(ref(db, `users/${uid}`), {
+          status: "active",
+
+          changed: new Date().getTime(),
+          updated: new Date().getTime(),
+        });
+
+        // Get user data:
+        onValue(ref(db, "users"), (snapshot) => {
+          const userData = snapshot.val();
+
+          // Update user status:
+          let statusData = {
+            active: 0,
+            idle: 0,
+          };
+          for (let u in userData) {
+            statusData[userData[u].status]++;
+          }
+
+          document.getElementsByClassName(
+            "users"
+          )[0].innerHTML = `${statusData.active}`;
+        });
+      });
+    </script>
+  </body>
